@@ -1,0 +1,30 @@
+{
+  "name": "@fintel/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "fintel": "dist/main.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "echo 'lint: cli (placeholder eslint wiring)'",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@fintel/config": "workspace:*",
+    "@fintel/core": "workspace:*",
+    "@fintel/domain": "workspace:*",
+    "@fintel/money-time": "workspace:*",
+    "@fintel/persistence": "workspace:*",
+    "@fintel/provenance": "workspace:*",
+    "@fintel/technical-analysis": "workspace:*",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
+  }
+}

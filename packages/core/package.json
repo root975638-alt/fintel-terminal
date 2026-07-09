@@ -1,0 +1,28 @@
+{
+  "name": "@fintel/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "echo 'lint: core (placeholder eslint wiring)'"
+  },
+  "dependencies": {
+    "@fintel/config": "workspace:*",
+    "@fintel/data-acquisition": "workspace:*",
+    "@fintel/domain": "workspace:*",
+    "@fintel/market-data": "workspace:*",
+    "@fintel/money-time": "workspace:*",
+    "@fintel/persistence": "workspace:*",
+    "@fintel/provenance": "workspace:*",
+    "@fintel/signals": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
+  }
+}

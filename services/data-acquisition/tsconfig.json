@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "references": [
+    { "path": "../../packages/compliance" },
+    { "path": "../../packages/config" },
+    { "path": "../../packages/domain" },
+    { "path": "../../packages/money-time" },
+    { "path": "../../packages/provenance" }
+  ],
+  "include": ["src"]
+}

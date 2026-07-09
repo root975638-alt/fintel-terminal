@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "lib": ["ES2022"],
+    "types": ["node"]
+  },
+  "references": [{ "path": "../../packages/config" }, { "path": "../../packages/domain" }, { "path": "../../packages/money-time" }, { "path": "../../packages/provenance" }],
+  "include": ["src"]
+}

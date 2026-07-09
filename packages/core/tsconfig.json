@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node"]
+  },
+  "references": [
+    { "path": "../config" },
+    { "path": "../../services/data-acquisition" },
+    { "path": "../domain" },
+    { "path": "../../services/market-data" },
+    { "path": "../money-time" },
+    { "path": "../../services/persistence" },
+    { "path": "../provenance" },
+    { "path": "../../services/signals" }
+  ],
+  "include": ["src"]
+}
