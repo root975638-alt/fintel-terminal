@@ -85,12 +85,10 @@ export class MarketDataService {
         }
         return this.opts.acquisition.nseIndia.fetchBars(query);
       case "US_EQUITIES":
-        if (timeframe === Timeframe.D1) {
-          // Prefer Stooq for daily US equities (explicitly free, unlimited history);
-          // fall back to Yahoo if Stooq has no data for this symbol.
-          const stooqBars = await this.opts.acquisition.stooq.fetchBars(query);
-          if (stooqBars.length > 0) return stooqBars;
-        }
+        // NOTE: Stooq was originally used here for daily bars but is disabled in the
+        // Source Registry — its robots.txt disallows all non-Googlebot/Bingbot user-agents
+        // (verified live, corrected after this platform's own compliance check caught the
+        // conflict). Yahoo's public chart endpoint is used for all US equities timeframes.
         return this.opts.acquisition.yahoo.fetchBars(query);
       case "BSE":
       case "FOREX":

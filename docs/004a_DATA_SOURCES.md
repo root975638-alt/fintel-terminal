@@ -5,12 +5,11 @@ This document is a **human-readable mirror** of the machine-enforced
 and the code ever disagree, **the code is authoritative** — update this file to
 match, never the other way around.
 
-## Enabled sources (11)
+## Enabled sources (10)
 
 | sourceId | Method | Cadence | Min. request interval | License / compliance basis |
 |---|---|---|---|---|
 | `yahoo-chart-api` | Public JSON endpoint | 15 min (treated as delayed) | 2000 ms | Unofficial but public, no-auth endpoint widely used by open-source libraries (e.g. yfinance) for low-volume research use. No SLA. |
-| `stooq-csv` | CSV download | 1 day | 3000 ms | Explicitly free CSV export, no auth, documented for public/personal use. |
 | `rss-reuters-business` | RSS/Atom | 5 min | 30000 ms | Publicly syndicated feed intended for aggregation. |
 | `rss-marketwatch-topstories` | RSS/Atom | 5 min | 30000 ms | Publicly syndicated feed. |
 | `rss-yahoo-finance-headlines` | RSS/Atom | 5 min | 30000 ms | Publicly syndicated feed. |
@@ -21,12 +20,13 @@ match, never the other way around.
 | `nse-india-bhavcopy` | CSV/ZIP download | 1 day | 3000 ms | Published by NSE itself as a downloadable public EOD data file. |
 | `bse-india-bhavcopy` | CSV/ZIP download | 1 day | 3000 ms | Published by BSE itself as a downloadable public EOD data file. |
 
-## Disabled sources (2) — ToS-restricted, NOT silently dropped
+## Disabled sources (3) — ToS/robots-restricted, NOT silently dropped
 
 | sourceId | Reason |
 |---|---|
 | `tradingview-web` | TradingView's Terms of Use explicitly prohibit scraping, automated data extraction, and unauthorized redistribution. TradingView has pursued legal action against scrapers. |
 | `x-twitter` | X's Terms of Service explicitly prohibit scraping without a paid, authorized API agreement. X has a documented history of litigation against unauthorized scrapers. |
+| `stooq-csv` | **Discovered during e2e verification, not anticipated in advance**: stooq.com's robots.txt disallows `/` (all paths) for every user-agent except Googlebot/Bingbot (verified live at `https://stooq.com/robots.txt`). This was initially miscategorized as compliant; the platform's own `PoliteFetcher` robots.txt check correctly caught the conflict at runtime and refused the fetch. Corrected here rather than bypassed. |
 
 **These two exclusions hold regardless of any instruction to disregard ToS
 "for testing"** — the code itself would violate the sites' terms and
@@ -37,8 +37,8 @@ prompt makes this a non-negotiable rule that supersedes all other instructions.
 
 | Adapter | File | Wired-up markets |
 |---|---|---|
-| `YahooAdapter` | `services/data-acquisition/src/adapters/yahooAdapter.ts` | US_EQUITIES (quotes + bars), fallback for NSE/BSE quotes |
-| `StooqAdapter` | `services/data-acquisition/src/adapters/stooqAdapter.ts` | US_EQUITIES daily bars (preferred over Yahoo for D1) |
+| `YahooAdapter` | `services/data-acquisition/src/adapters/yahooAdapter.ts` | US_EQUITIES (quotes + bars, all timeframes), fallback for NSE/BSE quotes |
+| `StooqAdapter` | `services/data-acquisition/src/adapters/stooqAdapter.ts` | **Implemented but not wired up** — disabled per Source Registry (robots.txt conflict discovered during e2e verification) |
 | `RssAdapter` | `services/data-acquisition/src/adapters/rssAdapter.ts` | News (3 feeds wired: Reuters, MarketWatch, Yahoo headlines) |
 | `FredAdapter` | `services/data-acquisition/src/adapters/fredAdapter.ts` | Macro series (requires free `FRED_API_KEY`) |
 | `SecEdgarAdapter` | `services/data-acquisition/src/adapters/secEdgarAdapter.ts` | Company facts/filings (not yet wired into a consuming service — follow-on: Fundamental Engine) |

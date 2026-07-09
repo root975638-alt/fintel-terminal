@@ -37,9 +37,16 @@ export const SOURCE_REGISTRY: readonly SourceRegistryEntry[] = [
     displayName: "Stooq.com free historical CSV export",
     method: "csv-download",
     url: "https://stooq.com/q/d/l/?s={symbol}&i=d",
-    license: "Explicitly free CSV export, no auth, documented for public/personal use.",
-    enabled: true,
-    robotsStatus: "allowed",
+    license: "Free CSV export exists, but Stooq's own robots.txt disallows all paths for general " +
+      "user-agents (only Googlebot/Bingbot are allowlisted) — verified live at https://stooq.com/robots.txt. " +
+      "Disabled per this platform's own robots.txt enforcement; not usable without Stooq's explicit permission.",
+    enabled: false,
+    disabledReason:
+      "robots.txt at stooq.com disallows \"/\" for all user-agents except Googlebot/Bingbot (verified live). " +
+      "This was initially miscategorized as allowed; corrected after the platform's own compliance check " +
+      "(assertSourceEnabled + robots.txt fetch) caught the conflict at runtime. Kept disabled until Stooq " +
+      "grants explicit permission or publishes an official API.",
+    robotsStatus: "disallowed",
     expectedCadenceMs: DAY,
     minRequestIntervalMs: 3_000,
   },

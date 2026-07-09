@@ -29,7 +29,9 @@ export function createDataAcquisitionLayer(config: AppConfig) {
   return {
     fetcher,
     yahoo: new YahooAdapter(fetcher),
-    stooq: new StooqAdapter(fetcher),
+    // NOTE: StooqAdapter class remains implemented and exported for potential future use,
+    // but is NOT wired up here — "stooq-csv" is disabled in the Source Registry because
+    // Stooq's robots.txt disallows all non-Googlebot/Bingbot user-agents (verified live).
     binance: new BinanceAdapter(fetcher),
     nseIndia: new NseIndiaAdapter(fetcher),
     secEdgar: new SecEdgarAdapter(fetcher),

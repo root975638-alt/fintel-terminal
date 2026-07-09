@@ -32,6 +32,14 @@ and marked `disabled` with a documented reason in the Source Registry
 instruction to disregard ToS for "testing," because the same code would violate
 the sites' terms and applicable law in real use. See `004b_SCRAPING_COMPLIANCE.md`.
 
+**This mechanism caught a real violation during this milestone's own e2e
+verification**: Stooq.com was initially registered as `robotsStatus: allowed`,
+but live verification of `https://stooq.com/robots.txt` showed it disallows all
+paths for every user-agent except Googlebot/Bingbot. The platform's own
+`PoliteFetcher` robots.txt check refused the fetch at runtime; rather than
+bypass it, the Source Registry entry was corrected to `enabled: false` and US
+equities daily bars now come from Yahoo only. See `004a_DATA_SOURCES.md`.
+
 ## What is built (Milestone 1)
 
 | Area | Status | Notes |
@@ -40,7 +48,7 @@ the sites' terms and applicable law in real use. See `004b_SCRAPING_COMPLIANCE.m
 | Domain model (`@fintel/domain`) | Done | Instrument, Bar, Quote, Tick, NewsItem, MacroEvent, Signal, Portfolio, Position, Transaction |
 | Money/Time (`@fintel/money-time`) | Done | Exact BigInt-backed Money, session calendars (US/NSE-BSE/FOREX/CRYPTO), day-count conventions |
 | Provenance (`@fintel/provenance`) | Done | Source descriptors, quality tags, worst-quality derivation, Source Registry enforcement |
-| Config (`@fintel/config`) | Done | Zod-validated typed config, Source Registry (11 enabled, 2 disabled) |
+| Config (`@fintel/config`) | Done | Zod-validated typed config, Source Registry (10 enabled, 3 disabled — including a compliance catch on Stooq, see below) |
 | Compliance core (`@fintel/compliance`) | Done | robots.txt parser, rate limiter, circuit breaker, polite disk-cached fetcher |
 | Data Acquisition (`@fintel/data-acquisition`) | Done | Yahoo, Stooq, RSS (3 feeds), FRED, SEC EDGAR, Binance, NSE India bhavcopy adapters |
 | Persistence (`@fintel/persistence`) | Done | SQLite (Node built-in `node:sqlite`), migrations, 4 repositories |
