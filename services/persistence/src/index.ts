@@ -8,6 +8,7 @@ import { SqliteBarRepository } from "./repositories/sqliteBarRepository.js";
 import { SqliteNewsRepository } from "./repositories/sqliteNewsRepository.js";
 import { SqliteSignalRepository } from "./repositories/sqliteSignalRepository.js";
 import { SqliteBacktestRunRepository } from "./repositories/sqliteBacktestRunRepository.js";
+import { SqliteMacroObservationRepository } from "./repositories/sqliteMacroObservationRepository.js";
 
 export * from "./repositories/ports.js";
 export * from "./migrationRunner.js";
@@ -17,6 +18,7 @@ export { SqliteBarRepository } from "./repositories/sqliteBarRepository.js";
 export { SqliteNewsRepository } from "./repositories/sqliteNewsRepository.js";
 export { SqliteSignalRepository } from "./repositories/sqliteSignalRepository.js";
 export * from "./repositories/sqliteBacktestRunRepository.js";
+export * from "./repositories/sqliteMacroObservationRepository.js";
 
 export interface PersistenceLayer {
   readonly db: DatabaseSync;
@@ -25,6 +27,7 @@ export interface PersistenceLayer {
   readonly news: SqliteNewsRepository;
   readonly signals: SqliteSignalRepository;
   readonly backtestRuns: SqliteBacktestRunRepository;
+  readonly macroObservations: SqliteMacroObservationRepository;
   close(): void;
 }
 
@@ -45,6 +48,7 @@ export function openPersistenceLayer(sqlitePath: string): PersistenceLayer {
     news: new SqliteNewsRepository(db),
     signals: new SqliteSignalRepository(db),
     backtestRuns: new SqliteBacktestRunRepository(db),
+    macroObservations: new SqliteMacroObservationRepository(db),
     close: () => db.close(),
   };
 }

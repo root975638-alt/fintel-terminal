@@ -55,12 +55,29 @@ equities daily bars now come from Yahoo only. See `004a_DATA_SOURCES.md`.
 | Market Data Service | Done | Per-market adapter routing, timeframe aggregation, gap detection |
 | Technical Analysis (`@fintel/technical-analysis`) | Done | SMA, EMA, WMA, RSI (Wilder), MACD, Bollinger, ATR (Wilder), historical volatility — all unit-tested vs. known values |
 | Signal Engine (`@fintel/signals`) | Done | 3 strategies (EMA/RSI trend, MACD momentum, Bollinger mean-reversion), confidence bounded by data quality, all labeled `HYPOTHESIS` |
-| **Backtest Engine (`@fintel/backtest`)** | **Done (Milestone 2)** | Deterministic event-driven engine, leakage-guarded (dedicated test), realistic costs, Sharpe/Sortino/drawdown/win-rate/profit-factor/expectancy metrics, walk-forward IS/OOS split |
-| **Quant Research (`@fintel/quant-research`)** | **Done (Milestone 2)** | Conservative promotion criteria (HYPOTHESIS→EXPERIMENTAL→ESTABLISHED), experiment registry recording every run including failures |
-| API Gateway (`@fintel/api-gateway`) | Done | Fastify REST: `/health`, `/doctor`, `/instruments`, `/instruments/:id`, `/instruments/:id/bars`, `/instruments/:id/signals`, `/instruments/:id/backtest` |
-| CLI (`@fintel/cli`) | Done | `fintel init`, `doctor`, `quote`, `chart` (ASCII sparkline), `signals`, `backtest` |
-| Tests | Done | 129 tests passing across the workspace (unit + integration) |
+| Backtest Engine (`@fintel/backtest`) | Done (Milestone 2) | Deterministic event-driven engine, leakage-guarded (dedicated test), realistic costs, Sharpe/Sortino/drawdown/win-rate/profit-factor/expectancy metrics, walk-forward IS/OOS split |
+| Quant Research (`@fintel/quant-research`) | Done (Milestone 2) | Conservative promotion criteria (HYPOTHESIS->EXPERIMENTAL->ESTABLISHED), experiment registry recording every run including failures |
+| **Fundamental Engine (`@fintel/fundamental`)** | **Done (Milestone 3)** | 22 ratio formulas, DCF + comparables valuation, Piotroski/Altman health scores, wired to live SEC EDGAR data |
+| **News Intelligence (`@fintel/news`)** | **Done (Milestone 3)** | Lexicon sentiment scoring, deterministic entity linking, per-feed failure isolation |
+| **Macro Engine (`@fintel/macro`)** | **Done (Milestone 3)** | Curated 5-series FRED catalogue, trend-based regime heuristics, explicit degraded mode without an API key |
+| API Gateway (`@fintel/api-gateway`) | Done | Fastify REST: `/health`, `/doctor`, `/instruments`, `/instruments/:id`, `/instruments/:id/bars`, `/instruments/:id/signals`, `/instruments/:id/backtest`, `/instruments/:id/fundamentals`, `/news`, `/macro` |
+| CLI (`@fintel/cli`) | Done | `fintel init`, `doctor`, `quote`, `chart`, `signals`, `backtest`, `fundamentals`, `news`, `macro` |
+| Tests | Done | 203 tests passing across the workspace (unit + integration) |
 | GitHub repo | Done | `root975638-alt/fintel-terminal` |
+
+## Milestone 3 real bugs found and fixed (not hypothetical)
+
+1. **SEC EDGAR 403**: our default User-Agent (with parentheses/URL) was
+   silently rejected. Fixed by changing the platform-wide default to a
+   simple `name email` format, verified live. See `008_FUNDAMENTAL_ENGINE.md`.
+2. **60-90+ second hang on a dead RSS feed**: the rate limiter was being
+   re-acquired on every retry attempt, so a source with a 30-second
+   inter-poll interval compounded that wait across retries. Fixed by
+   acquiring the rate limiter once per logical fetch, not once per retry.
+   Regression-tested. See `009_NEWS_ENGINE.md`.
+3. Both were found through actual end-to-end verification against live
+   sources, not by code review alone — reinforcing why this milestone always
+   runs real CLI/API commands against real data before considering a feature done.
 
 ## Milestone 2 honest finding
 
@@ -75,8 +92,7 @@ validation that doesn't exist, not a bug.
 
 - Web app (ultra-smooth TS SPA), design system, aaPanel deployment
 - Standalone binaries / install.sh / install.ps1 packaging
-- Fundamental engine (SEC EDGAR ratios/DCF), News Intelligence (sentiment/entity
-  linking), Macro Engine (regime tagging), Scanner, Alerts
+- Scanner, Alerts
 - Portfolio/Risk engines
 - AI Engine, Plugin system, Options/Futures/OrderBook engines
 - Additional market adapters: BSE India, forex, more crypto exchanges

@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "references": [
+    { "path": "../data-acquisition" },
+    { "path": "../../packages/domain" },
+    { "path": "../../packages/money-time" },
+    { "path": "../persistence" }
+  ],
+  "include": ["src"]
+}

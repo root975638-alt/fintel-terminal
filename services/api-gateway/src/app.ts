@@ -7,7 +7,7 @@
 import { randomUUID } from "node:crypto";
 import Fastify, { type FastifyInstance } from "fastify";
 import type { FintelCore } from "@fintel/core";
-import { findSeedInstrument, runDoctorChecks, runExperiment, SEED_INSTRUMENTS } from "@fintel/core";
+import { findSeedInstrument, runDoctorChecks, runExperiment, SEED_INSTRUMENTS, buildFundamentalSnapshot } from "@fintel/core";
 import { Timeframe } from "@fintel/money-time";
 import { worstQuality } from "@fintel/provenance";
 import type {
@@ -176,6 +176,56 @@ export function buildApp(core: FintelCore): FastifyInstance {
       return envelope({ runId, report, decision }, freshness);
     },
   );
+
+  app.get<{ Params: { instrumentId: string } }>("/instruments/:instrumentId/fundamentals", async (req, reply) => {
+    const { instrumentId } = req.params;
+    try {
+      const snapshot = await buildFundamentalSnapshot(instrumentId, core.acquisition.secEdgar);
+      return envelope(snapshot, {
+        quality: "delayed",
+        asOfMs: Date.now(),
+        sourceIds: ["sec-edgar-api"],
+      });
+    } catch (err) {
+      reply.status(400);
+      return reply.send({
+        meta: { requestId: randomUUID(), generatedAtMs: Date.now(), apiVersion: API_VERSION },
+        error: { code: "FUNDAMENTALS_UNAVAILABLE", message: (err as Error).message },
+      } satisfies ApiErrorBody);
+    }
+  });
+
+  app.get<{ Querystring: { symbol?: string; limit?: string } }>("/news", async (req) => {
+    const limit = req.query.limit ? Number(req.query.limit) : 20;
+    const { feedErrors } = await core.news.fetchAndEnrich();
+    const items = req.query.symbol
+      ? await core.news.forInstrument(req.query.symbol.toUpperCase(), limit)
+      : await core.news.recent(limit);
+
+    const freshness: FreshnessSummary = {
+      quality: worstQuality(items.map((i) => i.provenance.quality)),
+      asOfMs: items.length > 0 ? Math.max(...items.map((i) => i.provenance.asOfMs)) : Date.now(),
+      sourceIds: [...new Set(items.map((i) => i.provenance.source.sourceId))],
+    };
+    return envelope({ items, feedErrors }, freshness);
+  });
+
+  app.get("/macro", async (_req, reply) => {
+    if (!core.config.FRED_API_KEY) {
+      reply.status(503);
+      return reply.send({
+        meta: { requestId: randomUUID(), generatedAtMs: Date.now(), apiVersion: API_VERSION },
+        error: {
+          code: "FRED_API_KEY_MISSING",
+          message:
+            "FRED_API_KEY is not configured — macro data is unavailable (explicit degraded mode, not fabricated). " +
+            "Register a free key at https://fred.stlouisfed.org/docs/api/api_key.html.",
+        },
+      } satisfies ApiErrorBody);
+    }
+    const snapshot = await core.macro.computeSnapshot();
+    return envelope(snapshot, { quality: "delayed", asOfMs: snapshot.fetchedAtMs, sourceIds: ["fred-api"] });
+  });
 
   return app;
 }

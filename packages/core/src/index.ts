@@ -14,6 +14,8 @@ import { MarketDataService } from "@fintel/market-data";
 import { openPersistenceLayer, type PersistenceLayer } from "@fintel/persistence";
 import { SignalEngine } from "@fintel/signals";
 import { Timeframe } from "@fintel/money-time";
+import { NewsService } from "@fintel/news";
+import { MacroService } from "@fintel/macro";
 
 export interface FintelCore {
   readonly config: AppConfig;
@@ -21,6 +23,8 @@ export interface FintelCore {
   readonly persistence: PersistenceLayer;
   readonly marketData: MarketDataService;
   readonly signals: SignalEngine;
+  readonly news: NewsService;
+  readonly macro: MacroService;
   close(): void;
 }
 
@@ -30,6 +34,8 @@ export function createFintelCore(env: NodeJS.ProcessEnv = process.env): FintelCo
   const persistence = openPersistenceLayer(config.SQLITE_PATH);
   const marketData = new MarketDataService({ acquisition, persistence });
   const signals = new SignalEngine();
+  const news = new NewsService({ feeds: acquisition.newsFeeds, persistence, instrumentCatalogue: SEED_INSTRUMENTS });
+  const macro = new MacroService(acquisition.fred, persistence);
 
   return {
     config,
@@ -37,6 +43,8 @@ export function createFintelCore(env: NodeJS.ProcessEnv = process.env): FintelCo
     persistence,
     marketData,
     signals,
+    news,
+    macro,
     close: () => persistence.close(),
   };
 }
@@ -106,4 +114,8 @@ export * from "./doctor.js";
 export { runExperiment, evaluateSingleRun, decideLabelFromHistory } from "@fintel/quant-research";
 export type { ExperimentResult, RunExperimentOptions, PromotionDecision } from "@fintel/quant-research";
 export * from "@fintel/backtest";
+export { buildFundamentalSnapshot, SEED_CIK_BY_INSTRUMENT } from "@fintel/fundamental";
+export type { FundamentalSnapshot } from "@fintel/fundamental";
+export * from "@fintel/news";
+export * from "@fintel/macro";
 

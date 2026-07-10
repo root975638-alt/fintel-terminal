@@ -129,4 +129,19 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX idx_backtest_runs_instrument ON backtest_runs (instrument_id, run_at_ms DESC);
     `,
   },
+  {
+    version: 3,
+    name: "macro_observations",
+    sql: `
+      CREATE TABLE macro_observations (
+        series_id       TEXT NOT NULL,
+        date_ms         INTEGER NOT NULL,
+        value           REAL, -- NULL = missing observation (source reported "." or similar), never fabricated
+        fetched_at_ms   INTEGER NOT NULL,
+        source_id       TEXT NOT NULL,
+        PRIMARY KEY (series_id, date_ms)
+      );
+      CREATE INDEX idx_macro_observations_series ON macro_observations (series_id, date_ms DESC);
+    `,
+  },
 ];

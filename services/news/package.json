@@ -1,0 +1,24 @@
+{
+  "name": "@fintel/news",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run && tsc -p tsconfig.test.json && node --test dist-test/test/*.node-test.js",
+    "lint": "echo 'lint: news (placeholder eslint wiring)'"
+  },
+  "dependencies": {
+    "@fintel/data-acquisition": "workspace:*",
+    "@fintel/domain": "workspace:*",
+    "@fintel/money-time": "workspace:*",
+    "@fintel/persistence": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
+  }
+}

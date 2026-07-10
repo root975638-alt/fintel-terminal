@@ -7,6 +7,9 @@ import { runSignalsCommand } from "./commands/signals.js";
 import { runDoctorCommand } from "./commands/doctor.js";
 import { runInitCommand } from "./commands/init.js";
 import { runBacktestCommand } from "./commands/backtest.js";
+import { runFundamentalsCommand } from "./commands/fundamentals.js";
+import { runNewsCommand } from "./commands/news.js";
+import { runMacroCommand } from "./commands/macro.js";
 import { listKnownSymbolsHelp } from "./resolveInstrument.js";
 
 const program = new Command();
@@ -74,6 +77,35 @@ program
   .action(async (symbol, opts) => {
     printBanner();
     await runBacktestCommand(symbol, opts);
+  });
+
+program
+  .command("fundamentals <symbol>")
+  .description("Show fundamental ratios and health scores from SEC EDGAR (US equities only)")
+  .option("--json", "output machine-readable JSON")
+  .action(async (symbol, opts) => {
+    printBanner();
+    await runFundamentalsCommand(symbol, opts);
+  });
+
+program
+  .command("news")
+  .description("Show recent financial news with sentiment scoring and entity linking")
+  .option("--symbol <instrumentId>", "filter to news related to a specific instrument")
+  .option("-l, --limit <n>", "number of items to show", "20")
+  .option("--json", "output machine-readable JSON")
+  .action(async (opts) => {
+    printBanner();
+    await runNewsCommand(opts);
+  });
+
+program
+  .command("macro")
+  .description("Show US macro regime snapshot (rate + inflation trend) from FRED (requires FRED_API_KEY)")
+  .option("--json", "output machine-readable JSON")
+  .action(async (opts) => {
+    printBanner();
+    await runMacroCommand(opts);
   });
 
 program.parseAsync(process.argv).catch((err: unknown) => {

@@ -50,6 +50,15 @@ node clients/cli/dist/main.js signals CRYPTO:BTCUSDT
 
 # Walk-forward backtest (in-sample/out-of-sample, with honest promotion decision)
 node clients/cli/dist/main.js backtest CRYPTO:BTCUSDT --strategy ema-crossover-rsi-filter
+
+# Fundamental ratios from live SEC EDGAR data (US equities only)
+node clients/cli/dist/main.js fundamentals AAPL
+
+# Recent financial news with sentiment scoring and entity linking
+node clients/cli/dist/main.js news
+
+# US macro regime snapshot (requires a free FRED_API_KEY)
+node clients/cli/dist/main.js macro
 ```
 
 Or run the REST API:
@@ -81,7 +90,7 @@ persistence (Node built-in, zero native deps), Fastify API, Commander CLI.
 
 ## Testing
 
-129 tests passing across the workspace. See
+203 tests passing across the workspace. See
 [`docs/031_TESTING.md`](./docs/031_TESTING.md).
 
 ```bash
@@ -101,21 +110,23 @@ packages/
   core/                   Embeddable composition root (used by CLI + API)
 services/
   data-acquisition/  Yahoo/Stooq(disabled)/RSS/FRED/SEC/Binance/NSE adapters
-  persistence/        SQLite repositories + migrations (instruments, bars, news, signals, backtest runs)
+  persistence/        SQLite repositories + migrations (instruments, bars, news, signals, backtest runs, macro observations)
   market-data/         Aggregation, gap detection, per-market routing
   technical-analysis/   SMA/EMA/RSI/MACD/Bollinger/ATR
   signals/                Pluggable strategy framework + 3 strategies
   backtest/                 Deterministic, leakage-guarded walk-forward backtest engine
   quant-research/            Promotion criteria (HYPOTHESIS->EXPERIMENTAL->ESTABLISHED) + experiment registry
-  api-gateway/                 Fastify REST API (incl. /backtest)
+  fundamental/                22 ratio formulas, DCF/comparables valuation, Piotroski/Altman health scores
+  news/                        RSS sentiment + entity linking, per-feed failure isolation
+  macro/                        FRED series catalogue + trend-based regime tagging
+  api-gateway/                    Fastify REST API (incl. /backtest, /fundamentals, /news, /macro)
 clients/
-  cli/                Commander-based CLI/TUI (quote, chart, signals, backtest, doctor, init)
+  cli/                Commander-based CLI/TUI (quote, chart, signals, backtest, fundamentals, news, macro, doctor, init)
 docs/                 Architecture, compliance, testing docs (000-038 numbering)
 ```
 
 ## Roadmap (follow-on milestones, not yet built)
 
-- Fundamental Engine (SEC EDGAR ratios/DCF), News Intelligence, Macro regime tagging
 - Scanner + Alerts
 - Portfolio + Risk engines
 - Web app (ultra-smooth TypeScript SPA) + design system

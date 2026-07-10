@@ -17,9 +17,11 @@ const ConfigSchema = z.object({
   API_HOST: z.string().default("127.0.0.1"),
 
   // --- Compliance / networking ---
-  HTTP_USER_AGENT: z
-    .string()
-    .default("fintel-terminal/0.1 (+https://github.com/root975638-alt/fintel-terminal; research/educational use)"),
+  // NOTE: some sources (notably SEC EDGAR, verified live) reject User-Agent strings
+  // containing parentheses/URLs with a 403, even though their own docs show an
+  // example like "Sample Company Name AdminContact@sample.com". Kept simple
+  // (name + contact) for maximum compatibility while still being honest/identifiable.
+  HTTP_USER_AGENT: z.string().default("fintel-terminal-research contact@fintel-terminal.dev"),
   HTTP_TIMEOUT_MS: z.coerce.number().int().positive().default(15_000),
   HTTP_CACHE_DIR: z.string().default("./data-local/http-cache"),
   HTTP_CACHE_DEFAULT_TTL_MS: z.coerce.number().int().positive().default(10 * 60_000),

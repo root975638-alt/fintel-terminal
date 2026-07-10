@@ -115,9 +115,13 @@ export class PoliteFetcher {
   ): Promise<{ body: string; contentType: string | null }> {
     const maxRetries = this.opts.maxRetries ?? 3;
     let lastError: unknown;
+    // The inter-request politeness interval (minRequestIntervalMs) governs spacing between SEPARATE
+    // logical fetches to a source, not between retry attempts of the SAME failed request — acquiring
+    // it once here (not inside the loop) prevents a large minRequestIntervalMs (e.g. 30s for a slow-
+    // cadence RSS feed) from compounding with retry backoff into multi-minute waits on a failing source.
+    await this.rateLimiter.acquire(source.sourceId, clock);
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        await this.rateLimiter.acquire(source.sourceId, clock);
         const res = await fetch(url, {
           headers: { "User-Agent": this.opts.userAgent, Accept: "*/*" },
           signal: AbortSignal.timeout(this.opts.timeoutMs),

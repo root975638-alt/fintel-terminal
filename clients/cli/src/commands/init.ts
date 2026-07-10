@@ -15,7 +15,7 @@ API_PORT=4310
 API_HOST=127.0.0.1
 
 # --- Compliance / networking ---
-HTTP_USER_AGENT=fintel-terminal/0.1 (+https://github.com/root975638-alt/fintel-terminal; research/educational use)
+HTTP_USER_AGENT=fintel-terminal-research contact@fintel-terminal.dev
 HTTP_CACHE_DIR=./data-local/http-cache
 
 # --- FRED macro data (free self-service key, NOT a paid API) ---
