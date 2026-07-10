@@ -47,6 +47,9 @@ node clients/cli/dist/main.js chart CRYPTO:ETHUSDT --bars 60
 
 # Advisory signals (3 strategies: EMA/RSI trend, MACD momentum, Bollinger mean-reversion)
 node clients/cli/dist/main.js signals CRYPTO:BTCUSDT
+
+# Walk-forward backtest (in-sample/out-of-sample, with honest promotion decision)
+node clients/cli/dist/main.js backtest CRYPTO:BTCUSDT --strategy ema-crossover-rsi-filter
 ```
 
 Or run the REST API:
@@ -78,7 +81,7 @@ persistence (Node built-in, zero native deps), Fastify API, Commander CLI.
 
 ## Testing
 
-106 tests passing across the workspace. See
+129 tests passing across the workspace. See
 [`docs/031_TESTING.md`](./docs/031_TESTING.md).
 
 ```bash
@@ -97,14 +100,16 @@ packages/
   types/                 Shared API/CLI DTOs
   core/                   Embeddable composition root (used by CLI + API)
 services/
-  data-acquisition/  Yahoo/Stooq/RSS/FRED/SEC/Binance/NSE adapters
-  persistence/        SQLite repositories + migrations
+  data-acquisition/  Yahoo/Stooq(disabled)/RSS/FRED/SEC/Binance/NSE adapters
+  persistence/        SQLite repositories + migrations (instruments, bars, news, signals, backtest runs)
   market-data/         Aggregation, gap detection, per-market routing
   technical-analysis/   SMA/EMA/RSI/MACD/Bollinger/ATR
   signals/                Pluggable strategy framework + 3 strategies
-  api-gateway/              Fastify REST API
+  backtest/                 Deterministic, leakage-guarded walk-forward backtest engine
+  quant-research/            Promotion criteria (HYPOTHESIS->EXPERIMENTAL->ESTABLISHED) + experiment registry
+  api-gateway/                 Fastify REST API (incl. /backtest)
 clients/
-  cli/                Commander-based CLI/TUI
+  cli/                Commander-based CLI/TUI (quote, chart, signals, backtest, doctor, init)
 docs/                 Architecture, compliance, testing docs (000-038 numbering)
 ```
 
@@ -113,8 +118,6 @@ docs/                 Architecture, compliance, testing docs (000-038 numbering)
 - Fundamental Engine (SEC EDGAR ratios/DCF), News Intelligence, Macro regime tagging
 - Scanner + Alerts
 - Portfolio + Risk engines
-- Backtest Engine + Quant Research (needed before any signal can honestly be
-  labeled `ESTABLISHED` instead of `HYPOTHESIS`)
 - Web app (ultra-smooth TypeScript SPA) + design system
 - Packaging (standalone binaries, install scripts) + aaPanel deployment
 - AI Engine (local/open models, advisory-only)

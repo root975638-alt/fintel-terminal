@@ -1,6 +1,6 @@
 # 031 — Testing (Milestone 1)
 
-## Current state: 106 tests passing, 0 failing
+## Current state: 129 tests passing, 0 failing
 
 ```
 pnpm -r test
@@ -12,12 +12,14 @@ runs the full workspace suite. Breakdown:
 |---|---|---|
 | `@fintel/money-time` | 23 | Money exact decimal arithmetic (no float error), rounding modes, session calendars (US/NSE-BSE/FOREX/CRYPTO), day-count conventions |
 | `@fintel/provenance` | 11 | worstQuality derivation, deriveProvenance bounding, quality-from-age inference, source-enabled assertion |
-| `@fintel/config` | 9 | Config defaults/overrides/validation errors, Source Registry invariants (no dupes, disabled sources have reasons, TradingView/X marked disabled) |
+| `@fintel/config` | 9 | Config defaults/overrides/validation errors, Source Registry invariants (no dupes, disabled sources have reasons, TradingView/X/Stooq marked disabled) |
 | `@fintel/compliance` | 12 | robots.txt parsing (Allow/Disallow/Crawl-delay, longest-match-wins, wildcards), circuit breaker state transitions, rate limiter enforcement |
 | `@fintel/technical-analysis` | 16 | SMA/EMA hand-verified against known values, RSI monotonic-trend behavior + flat-series=50, MACD zero-histogram on flat series, Bollinger band width from a known population stdDev, ATR seeding behavior |
 | `@fintel/signals` | 3 | Insufficient-history → no signal, sustained-uptrend → long bias from the trend strategy, confidence bounded by worst input data quality |
 | `@fintel/market-data` | 7 | M1→H1 aggregation OHLCV correctness, quality-bounding through aggregation, gap detection on a continuous 24/7 calendar |
 | `@fintel/persistence` | 7 | Migration idempotency, Instrument/Bar upsert+query round-trips with **exact decimal string preservation**, conflict-update semantics, bucket-range filtering |
+| `@fintel/backtest` | 28 | Cost model (market impact + commission math), **leakage guard** (strategy never sees future bars, asserted via a spy strategy), full trade-mechanics integration (always-long, alternating-direction), Sharpe/Sortino/drawdown/win-rate/profit-factor hand-verified against known series, walk-forward IS/OOS independence |
+| `@fintel/quant-research` | 13 | Promotion bar logic (EXPERIMENTAL requires all 4 conditions), no single-run promotion to ESTABLISHED, instrument-diversity requirement for ESTABLISHED, prior non-clearing runs correctly excluded |
 | `@fintel/domain`, `@fintel/types`, `@fintel/core`, `@fintel/data-acquisition`, `@fintel/api-gateway`, `@fintel/cli` | 0 (passWithNoTests) | Pure type/interface or composition-only packages, exercised via the manual e2e smoke test below rather than isolated unit tests |
 
 ## End-to-end smoke test performed (manual, documented here for repeatability)

@@ -103,4 +103,7 @@ export { Timeframe };
 export * from "@fintel/domain";
 export * from "@fintel/provenance";
 export * from "./doctor.js";
+export { runExperiment, evaluateSingleRun, decideLabelFromHistory } from "@fintel/quant-research";
+export type { ExperimentResult, RunExperimentOptions, PromotionDecision } from "@fintel/quant-research";
+export * from "@fintel/backtest";
 

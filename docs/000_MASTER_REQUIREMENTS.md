@@ -50,15 +50,26 @@ equities daily bars now come from Yahoo only. See `004a_DATA_SOURCES.md`.
 | Provenance (`@fintel/provenance`) | Done | Source descriptors, quality tags, worst-quality derivation, Source Registry enforcement |
 | Config (`@fintel/config`) | Done | Zod-validated typed config, Source Registry (10 enabled, 3 disabled — including a compliance catch on Stooq, see below) |
 | Compliance core (`@fintel/compliance`) | Done | robots.txt parser, rate limiter, circuit breaker, polite disk-cached fetcher |
-| Data Acquisition (`@fintel/data-acquisition`) | Done | Yahoo, Stooq, RSS (3 feeds), FRED, SEC EDGAR, Binance, NSE India bhavcopy adapters |
-| Persistence (`@fintel/persistence`) | Done | SQLite (Node built-in `node:sqlite`), migrations, 4 repositories |
+| Data Acquisition (`@fintel/data-acquisition`) | Done | Yahoo, Stooq (disabled), RSS (3 feeds), FRED, SEC EDGAR, Binance, NSE India bhavcopy adapters |
+| Persistence (`@fintel/persistence`) | Done | SQLite (Node built-in `node:sqlite`), migrations (2), 5 repositories (incl. backtest runs) |
 | Market Data Service | Done | Per-market adapter routing, timeframe aggregation, gap detection |
 | Technical Analysis (`@fintel/technical-analysis`) | Done | SMA, EMA, WMA, RSI (Wilder), MACD, Bollinger, ATR (Wilder), historical volatility — all unit-tested vs. known values |
 | Signal Engine (`@fintel/signals`) | Done | 3 strategies (EMA/RSI trend, MACD momentum, Bollinger mean-reversion), confidence bounded by data quality, all labeled `HYPOTHESIS` |
-| API Gateway (`@fintel/api-gateway`) | Done | Fastify REST: `/health`, `/doctor`, `/instruments`, `/instruments/:id`, `/instruments/:id/bars`, `/instruments/:id/signals` |
-| CLI (`@fintel/cli`) | Done | `fintel init`, `doctor`, `quote`, `chart` (ASCII sparkline), `signals` |
-| Tests | Done | 106 tests passing across the workspace (unit + integration) |
-| GitHub repo | Next | `root975638-alt/fintel-terminal` |
+| **Backtest Engine (`@fintel/backtest`)** | **Done (Milestone 2)** | Deterministic event-driven engine, leakage-guarded (dedicated test), realistic costs, Sharpe/Sortino/drawdown/win-rate/profit-factor/expectancy metrics, walk-forward IS/OOS split |
+| **Quant Research (`@fintel/quant-research`)** | **Done (Milestone 2)** | Conservative promotion criteria (HYPOTHESIS→EXPERIMENTAL→ESTABLISHED), experiment registry recording every run including failures |
+| API Gateway (`@fintel/api-gateway`) | Done | Fastify REST: `/health`, `/doctor`, `/instruments`, `/instruments/:id`, `/instruments/:id/bars`, `/instruments/:id/signals`, `/instruments/:id/backtest` |
+| CLI (`@fintel/cli`) | Done | `fintel init`, `doctor`, `quote`, `chart` (ASCII sparkline), `signals`, `backtest` |
+| Tests | Done | 129 tests passing across the workspace (unit + integration) |
+| GitHub repo | Done | `root975638-alt/fintel-terminal` |
+
+## Milestone 2 honest finding
+
+Running all 3 signal strategies through the new walk-forward backtest against
+real BTC/ETH data: **0 of 6 strategy/instrument combinations cleared the
+`EXPERIMENTAL` promotion bar.** All remain honestly labeled `HYPOTHESIS`. See
+`016_BACKTEST_ENGINE.md` and `017_QUANT_RESEARCH_ENGINE.md` for the full
+results table and analysis — this is the system correctly refusing to claim
+validation that doesn't exist, not a bug.
 
 ## What is explicitly NOT in this milestone (follow-on work)
 
@@ -66,7 +77,7 @@ equities daily bars now come from Yahoo only. See `004a_DATA_SOURCES.md`.
 - Standalone binaries / install.sh / install.ps1 packaging
 - Fundamental engine (SEC EDGAR ratios/DCF), News Intelligence (sentiment/entity
   linking), Macro Engine (regime tagging), Scanner, Alerts
-- Portfolio/Risk engines, Backtest Engine, Quant Research platform
+- Portfolio/Risk engines
 - AI Engine, Plugin system, Options/Futures/OrderBook engines
 - Additional market adapters: BSE India, forex, more crypto exchanges
 - Auth/RBAC/multi-tenant (not needed for a local single-user CLI/API yet)

@@ -7,6 +7,7 @@ import { SqliteInstrumentRepository } from "./repositories/sqliteInstrumentRepos
 import { SqliteBarRepository } from "./repositories/sqliteBarRepository.js";
 import { SqliteNewsRepository } from "./repositories/sqliteNewsRepository.js";
 import { SqliteSignalRepository } from "./repositories/sqliteSignalRepository.js";
+import { SqliteBacktestRunRepository } from "./repositories/sqliteBacktestRunRepository.js";
 
 export * from "./repositories/ports.js";
 export * from "./migrationRunner.js";
@@ -15,6 +16,7 @@ export { SqliteInstrumentRepository } from "./repositories/sqliteInstrumentRepos
 export { SqliteBarRepository } from "./repositories/sqliteBarRepository.js";
 export { SqliteNewsRepository } from "./repositories/sqliteNewsRepository.js";
 export { SqliteSignalRepository } from "./repositories/sqliteSignalRepository.js";
+export * from "./repositories/sqliteBacktestRunRepository.js";
 
 export interface PersistenceLayer {
   readonly db: DatabaseSync;
@@ -22,6 +24,7 @@ export interface PersistenceLayer {
   readonly bars: SqliteBarRepository;
   readonly news: SqliteNewsRepository;
   readonly signals: SqliteSignalRepository;
+  readonly backtestRuns: SqliteBacktestRunRepository;
   close(): void;
 }
 
@@ -41,6 +44,7 @@ export function openPersistenceLayer(sqlitePath: string): PersistenceLayer {
     bars: new SqliteBarRepository(db),
     news: new SqliteNewsRepository(db),
     signals: new SqliteSignalRepository(db),
+    backtestRuns: new SqliteBacktestRunRepository(db),
     close: () => db.close(),
   };
 }

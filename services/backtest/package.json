@@ -1,5 +1,5 @@
 {
-  "name": "@fintel/core",
+  "name": "@fintel/backtest",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,18 +9,12 @@
     "build": "tsc -b",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "lint": "echo 'lint: core (placeholder eslint wiring)'"
+    "lint": "echo 'lint: backtest (placeholder eslint wiring)'"
   },
   "dependencies": {
-    "@fintel/backtest": "workspace:*",
-    "@fintel/config": "workspace:*",
-    "@fintel/data-acquisition": "workspace:*",
     "@fintel/domain": "workspace:*",
-    "@fintel/market-data": "workspace:*",
     "@fintel/money-time": "workspace:*",
-    "@fintel/persistence": "workspace:*",
     "@fintel/provenance": "workspace:*",
-    "@fintel/quant-research": "workspace:*",
     "@fintel/signals": "workspace:*"
   },
   "devDependencies": {

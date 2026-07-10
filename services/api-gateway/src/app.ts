@@ -7,7 +7,7 @@
 import { randomUUID } from "node:crypto";
 import Fastify, { type FastifyInstance } from "fastify";
 import type { FintelCore } from "@fintel/core";
-import { findSeedInstrument, runDoctorChecks, SEED_INSTRUMENTS } from "@fintel/core";
+import { findSeedInstrument, runDoctorChecks, runExperiment, SEED_INSTRUMENTS } from "@fintel/core";
 import { Timeframe } from "@fintel/money-time";
 import { worstQuality } from "@fintel/provenance";
 import type {
@@ -129,6 +129,51 @@ export function buildApp(core: FintelCore): FastifyInstance {
         sourceIds: [...new Set(bars.map((b) => b.provenance.source.sourceId))],
       };
       return envelope(signals, freshness);
+    },
+  );
+
+  app.get<{ Params: { instrumentId: string }; Querystring: { timeframe?: string; strategy?: string } }>(
+    "/instruments/:instrumentId/backtest",
+    async (req, reply) => {
+      const { instrumentId } = req.params;
+      const instrument = (await core.persistence.instruments.findById(instrumentId)) ?? findSeedInstrument(instrumentId);
+      if (!instrument) {
+        reply.status(404);
+        return reply.send({
+          meta: { requestId: randomUUID(), generatedAtMs: Date.now(), apiVersion: API_VERSION },
+          error: { code: "NOT_FOUND", message: `Instrument "${instrumentId}" not found.` },
+        } satisfies ApiErrorBody);
+      }
+      await core.marketData.ensureInstrument(instrument);
+      const timeframe = (req.query.timeframe as Timeframe) ?? Timeframe.D1;
+      const bars = await core.marketData.getBars(instrument, timeframe);
+
+      const strategies = core.signals.listStrategies();
+      const strategy = req.query.strategy ? strategies.find((s) => s.strategyId === req.query.strategy) : strategies[0];
+      if (!strategy) {
+        reply.status(400);
+        return reply.send({
+          meta: { requestId: randomUUID(), generatedAtMs: Date.now(), apiVersion: API_VERSION },
+          error: {
+            code: "UNKNOWN_STRATEGY",
+            message: `Unknown strategy "${req.query.strategy}". Available: ${strategies.map((s) => s.strategyId).join(", ")}`,
+          },
+        } satisfies ApiErrorBody);
+      }
+
+      const { runId, report, decision } = await runExperiment({
+        instrumentId: instrument.instrumentId,
+        bars,
+        strategy,
+        persistence: core.persistence,
+      });
+
+      const freshness: FreshnessSummary = {
+        quality: worstQuality(bars.map((b) => b.provenance.quality)),
+        asOfMs: bars.length > 0 ? Math.max(...bars.map((b) => b.provenance.asOfMs)) : Date.now(),
+        sourceIds: [...new Set(bars.map((b) => b.provenance.source.sourceId))],
+      };
+      return envelope({ runId, report, decision }, freshness);
     },
   );
 

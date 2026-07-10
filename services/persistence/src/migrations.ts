@@ -99,4 +99,34 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX idx_signals_instrument ON signals (instrument_id, generated_at_ms DESC);
     `,
   },
+  {
+    version: 2,
+    name: "backtest_runs",
+    sql: `
+      CREATE TABLE backtest_runs (
+        run_id                TEXT PRIMARY KEY,
+        instrument_id         TEXT NOT NULL,
+        strategy_id           TEXT NOT NULL,
+        run_at_ms             INTEGER NOT NULL,
+        in_sample_fraction    REAL NOT NULL,
+        initial_capital       REAL NOT NULL,
+        cost_model_json       TEXT NOT NULL,
+        is_bar_count          INTEGER NOT NULL,
+        is_trade_count        INTEGER NOT NULL,
+        is_total_return_pct   REAL NOT NULL,
+        is_sharpe_ratio       REAL,
+        is_max_drawdown_pct   REAL NOT NULL,
+        oos_bar_count         INTEGER NOT NULL,
+        oos_trade_count       INTEGER NOT NULL,
+        oos_total_return_pct  REAL NOT NULL,
+        oos_sharpe_ratio      REAL,
+        oos_max_drawdown_pct  REAL NOT NULL,
+        oos_holds_up          INTEGER, -- NULL = insufficient OOS trades to judge; 0/1 otherwise
+        promoted_label        TEXT NOT NULL, -- honesty label decision recorded for this run (never fabricated after the fact)
+        full_report_json      TEXT NOT NULL -- complete WalkForwardReport, JSON-serialized, for audit/reproducibility
+      );
+      CREATE INDEX idx_backtest_runs_strategy ON backtest_runs (strategy_id, run_at_ms DESC);
+      CREATE INDEX idx_backtest_runs_instrument ON backtest_runs (instrument_id, run_at_ms DESC);
+    `,
+  },
 ];

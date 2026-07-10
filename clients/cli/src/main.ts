@@ -6,6 +6,7 @@ import { runChartCommand } from "./commands/chart.js";
 import { runSignalsCommand } from "./commands/signals.js";
 import { runDoctorCommand } from "./commands/doctor.js";
 import { runInitCommand } from "./commands/init.js";
+import { runBacktestCommand } from "./commands/backtest.js";
 import { listKnownSymbolsHelp } from "./resolveInstrument.js";
 
 const program = new Command();
@@ -62,6 +63,17 @@ program
   .action(async (symbol, opts) => {
     printBanner();
     await runSignalsCommand(symbol, opts);
+  });
+
+program
+  .command("backtest <symbol>")
+  .description("Run a walk-forward (in-sample/out-of-sample) backtest of a strategy and show honest performance metrics")
+  .option("-t, --timeframe <tf>", "timeframe (1m,5m,15m,30m,1h,4h,1d,1w,1M)", "1d")
+  .option("-s, --strategy <id>", "strategy id (default: first registered strategy)")
+  .option("--json", "output machine-readable JSON")
+  .action(async (symbol, opts) => {
+    printBanner();
+    await runBacktestCommand(symbol, opts);
   });
 
 program.parseAsync(process.argv).catch((err: unknown) => {
